@@ -1,0 +1,15 @@
+{% if page_obj.has_other_pages %}
+    <div class="paginator-wrapper">
+        <div class="content paginator">
+
+            {% for page in paginator.page_range %}
+                {% if page_obj.number == page %}
+                    <div class="paginator-page paginator-current-page">{{ page }}</div>
+                {% elif page >= page_obj.number|add:-2 and page <= page_obj.number|add:2 %}
+                    <a class="paginator-page" href="?page={{ page }}">{{ page }}</a>
+                {% endif %}
+            {% endfor %}
+
+        </div>
+    </div>
+{% endif %}

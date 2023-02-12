@@ -1,0 +1,587 @@
+:root {
+    --black: #000000;
+    --white: #FFFFFF;
+    --dark-gray: #1C1C1E;
+    --gray-fields: #39383D;
+    --gray-line: #58585A;
+    --gray-font: #868688;
+    --gray-placeholder: #757575;
+    --gray: #5E5E60;
+    --red: #FD393A;
+    --blue: #117DEC;
+    
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; 
+}
+
+
+html {
+    background-color: var(--black);
+    color: var(--white);
+    font-family: 'Roboto', sans-serif;
+    font-size: 62.5%;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+}
+
+body {
+    font-size: 2rem;
+    min-height: 100vh;
+}
+
+a,
+a:hover,
+a:active{
+    text-decoration: none;
+    color: var(--white);
+}
+
+li {
+    list-style: none;
+}
+
+table {
+    border-spacing: 0px;
+}
+
+table th {
+    font-weight: normal;
+    color: var(--gray-font);
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.content-wrapper {
+    display: grid;
+    max-width: 1200px;
+    min-width: 320px;
+    margin: 0 auto;
+}
+
+header {
+    background-color: var(--dark-gray);
+}
+
+header .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .625em;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+nav li {
+    padding: .5em .3em;
+}
+
+nav li a {
+    transition: all .2s;
+}
+
+nav li a:hover {
+    transition: all .2s;
+    color: var(--gray);
+}
+
+.nav-links-wrapper {
+    display: flex;
+}
+
+.nav-links {
+    display: flex;
+}
+
+.logo {
+    font-size: 2.4em;
+}
+
+#checkbox_toggle,
+#checkbox_toggle_filter {
+    display: none;
+}   
+
+.hamburger {
+    display: none;
+    height: 100%;
+    cursor: pointer;
+    padding: .75em 0;
+}
+
+.hamburger-line {
+    background-color: var(--dark-gray);
+    display: block;
+    height: 2px;
+    position: relative;
+    width: 1.2em;
+}
+
+.hamburger-line::before,
+.hamburger-line::after {
+    background-color: var(--white);
+    content: '';
+    display: block;
+    position: absolute;
+    transition: all .2s;
+    border-radius: 2px;
+    width: 100%;
+    height: 100%;
+}
+
+.hamburger-line::before {
+    top: 5px;
+}
+
+.hamburger-line::after {
+    top: -5px;
+}
+
+.form-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-width: 100%;
+    max-width: 100%;
+}
+
+.title {
+    font-size: 1.25em;
+}
+
+.form-title,
+.transactions-title {
+    padding-bottom: .25em;
+}
+
+.form-transactions {
+    display: grid;
+    gap: .1em;
+    padding: .5em 1em;
+    background-color: var(--dark-gray);
+    border-radius: 1em;
+    min-width: 100%;
+    max-width: 100%;
+}
+
+.form-transactions select {
+    appearance: none;
+}
+
+.form-group {
+    display: grid;
+    row-gap: .3em;
+}
+
+.form-control {
+    background-color: var(--gray-fields);
+    font-family: 'Roboto', sans-serif;
+    color: var(--gray-font);
+    font-size: .85em;
+    text-align: left;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    height: 2.2em;
+    padding-left: 1em;
+    border: none;
+    border-radius: 0.5em;
+}
+
+input[type="date"].form-control  {
+    width: 100%;
+    min-width: 96%;
+}
+
+.form-control:focus {
+    border: 1px solid var(--white);
+}
+
+.form-btn {
+    font-size: 0.75em;
+    height: 2.8em;
+    width: 50%;
+    align-self: center;
+    margin-top: 0.5em;
+    background-color: var(--blue);
+    color: var(--white);
+    border: none;
+    border-radius: 3em;
+    justify-self: center;
+    cursor: pointer;
+}
+
+.reset-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.buttons-panel {
+    display: grid;
+    grid-template-areas: '. submit reset';
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 1em;
+    width: 100%;
+}
+
+.buttons-panel .form-btn {
+    grid-area: submit;
+    width: 100%;
+}
+
+.buttons-panel .reset-btn {
+    grid-area: reset;
+}
+
+.transactions-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    min-width: 100%;
+}
+
+.transactions-table {
+    display: block;
+    background-color: var(--dark-gray);
+    padding: 0 1em;
+    border: none;
+    border-radius: 1em;
+    max-width: 100%;
+    min-width: 100%;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.transactions-table tbody {
+    display: block;
+}
+
+.transactions-table tr {
+    display: flex;
+    max-width: 100%;
+    width: 100%;
+    border-bottom: 1px solid var(--gray-line);
+}
+
+.transactions-table th,
+.transactions-table td {
+    display: inline-block;
+    width: 25%;
+    padding: .2em .3em;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+}
+
+.transactions-table tr:last-child{
+    border-bottom: none;
+}
+
+td.value {
+    text-align: right;
+}
+
+/* Transactions page */
+
+.transactions-layout {
+    display: grid;
+    gap: 1em;
+    grid-template-areas:
+        "info table"
+        "filter table";
+    grid-template-columns: 1.1fr 3fr;
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    max-width: 100%;
+    padding: 1em .5em 0 .5em;
+}
+
+.info {
+    background-color: var(--dark-gray);
+    grid-area: info;
+    padding: .5em 1em;
+    overflow: hidden;
+    border-radius: 1em;
+}
+
+.info-table {
+    min-width: 100%;
+}
+
+.info-table .info-label {
+    padding-right: .5em;
+}
+
+.info-table td {
+    border-bottom: 1px solid var(--gray-line);
+    padding-top: .5em;
+}
+
+.transactions-filter-wrapper {
+    display: grid;
+    grid-template-areas:
+        'filter-title filter-arrow'
+        'filter filter';
+    grid-template-columns: 90% 10%;
+    min-width: 100%;
+    background-color: var(--dark-gray);
+    grid-area: filter;
+    justify-content: flex-start;
+    align-items: flex-start;
+    border-right: 1px solid var(--gray-lines);
+    border-radius: 1em;
+    position: sticky;
+    padding: .5em 1em;
+    top: 0;
+}
+
+.transactions-wrapper.transactions-page {
+    grid-area: table;
+    padding: 0;
+}
+
+.transactions-table.transactions-page {
+    min-width: 100%;
+    border: none;
+}
+
+.transactions-table.transactions-page th{
+    position: sticky;
+    top: 0;
+    background-color: var(--dark-gray);
+}
+
+.transactions-table td,
+.transactions-table th {
+    border-right: 1px solid var(--gray-lines) ;
+}
+
+
+.form-transactions-filter {
+    display: flex;
+    grid-area: filter;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-width: 100%;
+}
+
+.form-transactions-filter .form-group {
+    width: 100%;
+    padding-top: .5em;
+    padding-bottom: .5em;
+    border-top: 1px solid var(--gray-line);
+    border-collapse: separate;
+}
+
+.form-transactions-filter .form-group:last-of-type {
+    border-bottom: 1px solid var(--gray-line);
+}
+
+.form-error {
+    font-size: .75em;
+    color: var(--red)
+}
+
+.form-checkbox label {
+    font-size: .8em;
+    color: var(--gray-font);
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: .5em;
+    padding-bottom: .2em;
+    overflow-wrap: anywhere;
+}
+
+.form-checkbox input {
+    position: relative;
+    z-index: -1;
+    transform: scale(0.5);
+}
+
+.form-checkbox input::before,
+.form-checkbox input::after {
+    display: block;
+    position: absolute;
+    content: "";
+    background-color: var(--gray-fields);
+    width: 250%;
+    height: 250%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: .5em;
+    z-index: 1;
+}
+
+.form-checkbox input::after {
+    display: none;
+    background-color: var(--white);
+    width: 125%;
+    height: 125%;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+}
+
+.form-checkbox input:checked::after {
+    display: block;
+}
+
+.main-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-width: 50%;
+    max-width: 60%;
+    padding: .5em;
+    gap: .5em;
+    justify-self: center;
+}
+
+.filter-title {
+    grid-area: filter-title;
+}
+
+.collapse-arrow {
+    display: none;
+    grid-area: filter-arrow;
+    align-self: center;
+    justify-self: end;
+    height: 1em;
+    width: 1em;
+    cursor: pointer;
+    right: 1em;
+    top: .75em;
+}
+
+.collapse-arrow-line {
+    display: block;
+    height: .75em;
+    width: .75em;
+    cursor: pointer;
+    border-right: 2px solid var(--gray-font);
+    border-bottom: 2px solid var(--gray-font);
+    border-radius: .1em;
+    transform: rotate(45deg);
+    position: absolute;
+    transition: all .25s;
+}
+
+
+@media (max-width: 750px) {
+    body {
+        font-size: 1.4rem;
+    }
+    
+    .form-checkbox input{
+        transform: scale(0.40);
+    }
+
+    .transactions-layout {
+        grid-template-areas:
+        'info'
+        'filter'
+        'table';
+        grid-template-columns: 1fr;
+    }
+
+    .transactions-filter-wrapper {
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-transactions-filter {
+        max-height: 0;
+        overflow: hidden;
+    }
+
+    .collapse-arrow {
+        display: block;
+    }
+
+    #checkbox_toggle_filter:checked ~ .form-transactions-filter  {
+        max-height: fit-content;
+
+    }
+
+    #checkbox_toggle_filter:checked ~ .collapse-arrow .collapse-arrow-line {
+        transform: rotate(-135deg);
+    }
+}
+
+@media (max-width: 500px) {
+    body {
+        font-size: 1.35rem;
+    }
+
+    .navbar {
+        position: relative;
+    }
+
+    .nav-links-wrapper {
+        max-height: 0;
+        overflow: hidden;
+        position: absolute;
+        background-color: var(--dark-gray);
+        text-align: center;
+        justify-content: center;
+        right: 0;
+        left: 0;
+        top: 100%;
+        z-index: 10;
+    }
+
+    .nav-links {
+        flex-flow: column;
+    }
+
+    .nav-links li {
+        padding-bottom: .25em;
+        border-bottom: 1px solid var(--gray-line);
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    #checkbox_toggle:checked ~ .nav-links-wrapper {
+        max-height: calc(100vh - 100%);
+        min-height: calc(100vh - 100%);
+    }
+
+    #checkbox_toggle:checked ~ .hamburger .hamburger-line::before {
+        transform: rotate(-45deg);
+        top: 0;
+    }
+
+    #checkbox_toggle:checked ~ .hamburger .hamburger-line::after {
+        transform: rotate(45deg);
+        top: 0;
+    }
+
+    .form-checkbox input{
+        transform: scale(0.35);
+    }
+
+    .main-page-wrapper {
+        min-width: 100%;
+    }
+}
+
+.grid-table {
+    display: grid;
+    grid-template-columns: 1fr 2fr 2fr 2.5fr;
+}

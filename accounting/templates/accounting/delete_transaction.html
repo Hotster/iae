@@ -1,0 +1,15 @@
+{% extends 'accounting/transaction_details.html' %}
+
+{% block delete-form %}
+
+<form method="POST">
+    <div class="warning-label">Are you sure you want to delete the transaction?</div>
+    {% csrf_token %}
+    <div class="buttons-panel buttons-panel-right-side">
+        <button type="submit" class="btn btn-danger btn-first">Yes</button>
+        <a href="{% url 'transaction_details' pk=transaction.pk %}" class="btn btn-primary btn-second">Cancel</a>
+    </div>
+
+</form>
+
+{% endblock %}

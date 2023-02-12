@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% include 'accounting/header.html' %}
+
+<div class="page-wrapper">
+
+    <div class="content-wrapper half-width-wrapper">
+
+        <div class="content">
+            <div class="buttons-panel buttons-panel-right-side">
+                <div class="title">Payment types</div>
+                <a href="{% url 'create_payment_type' %}" class="btn btn-primary btn-first">Add new</a>
+                <a href="{% url 'transfer_between_payment_types' %}" class="btn btn-primary btn-second">Transfer</a>
+            </div>
+        </div>
+
+
+        {% for payment_type in payment_types %}
+            <div class="content card">
+
+                <div class="title">{{ payment_type.name }}</div>
+                <div class="card-text">{{ payment_type.balance }}</div>
+
+                {% block delete-form %}
+                    <div class="buttons-panel">
+                        <a href="{% url 'update_payment_type' pk=payment_type.pk %}?redirect_url={{ request.get_full_path }}" class="btn btn-primary btn-round"><img class="icon" src="{% static 'accounting/img/edit.svg' %}"></a>
+                        <a href="{% url 'delete_payment_type' pk=payment_type.pk %}" class="btn btn-danger btn-round"><img class="icon" src="{% static 'accounting/img/close.svg' %}"></a>
+                    </div>
+                {% endblock %}
+
+            </div>
+        {% endfor %}
+        
+        {% include 'accounting/paginator.html' %}
+
+    </div>
+
+
+
+</div>
+{% endblock %}

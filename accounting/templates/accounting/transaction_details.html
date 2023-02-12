@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'accounting/header.html' %}
+
+<div class="page-wrapper">
+
+    <div class="content-wrapper half-width-wrapper">
+        <div class="content transaction-details">
+
+            <div class="details-group">
+                <div class="title">Date:</div>
+                <div class="details-value-container"><div class="details-value">{{ transaction.date }}</div></div>
+            </div>
+
+            <div class="details-group">
+                <div class="title">Category:</div>
+                <div class="details-value-container"><div class="details-value">{{ transaction.category }}</div></div>
+            </div>
+
+            <div class="details-group">
+                <div class="title">Value</div>
+                <div class="details-value-container"><div class="details-value">{{ transaction.value }}</div></div>
+            </div>
+
+            <div class="details-group">
+                <div class="title">Payment type:</div>
+                <div class="details-value-container"><div class="details-value">{{ transaction.payment_type }}</div></div>
+            </div>
+
+            <div class="details-group">
+                <div class="title">Description</div>
+                <div class="details-value-container"><div class="details-value">{{ transaction.description }}</div></div>
+            </div>
+
+            {% block delete-form %}
+                <div class="buttons-panel buttons-panel-right-side">
+                    <a href="{% url 'update_transaction' pk=transaction.pk %}?redirect_url={{ request.get_full_path }}" class="btn btn-primary btn-first">Edit</a>
+                    <a href="{% url 'delete_transaction' pk=transaction.pk %}" class="btn btn-danger btn-second">Delete</a>
+                </div>
+            {% endblock %}
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

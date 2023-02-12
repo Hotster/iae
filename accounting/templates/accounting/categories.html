@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% include 'accounting/header.html' %}
+
+<div class="page-wrapper">
+
+    <div class="content-wrapper half-width-wrapper">
+
+        <div class="content">
+            <div class="buttons-panel buttons-panel-right-side">
+                <div class="title">Categories</div>
+                <a href="{% url 'create_category' %}" class="btn btn-primary btn-second">Add new</a>
+            </div>
+        </div>
+
+
+        {% for category in categories %}
+            <div class="content card">
+
+                <div class="title">{{ category.name }}</div>
+                <div class="card-text">{{ category.type }}</div>
+
+                {% block delete-form %}
+                    <div class="buttons-panel">
+                        <a href="{% url 'update_category' pk=category.pk %}?redirect_url={{ request.get_full_path }}" class="btn btn-primary btn-round"><img class="icon" src="{% static 'accounting/img/edit.svg' %}"></a>
+                        <a href="{% url 'delete_category' pk=category.pk %}" class="btn btn-danger btn-round"><img class="icon" src="{% static 'accounting/img/close.svg' %}"></a>
+                    </div>
+                {% endblock %}
+
+            </div>
+        {% endfor %}
+
+        {% include 'accounting/paginator.html' %}
+
+    </div>
+
+</div>
+{% endblock %}

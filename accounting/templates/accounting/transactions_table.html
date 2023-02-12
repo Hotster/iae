@@ -1,0 +1,22 @@
+<div class="content">
+    <table class="transactions-table">
+
+        <tr>
+            <th class="date">Date</th>
+            <th>Payment</th>
+            <th>Category</th>
+            <th class="value">Value</th>
+        </tr>
+    
+        {% for transaction in transactions %}
+        <tr>
+            <td class="date"><a href="{% url 'transaction_details' pk=transaction.pk %}">{{ transaction.date }}</a></td>
+            <td class="payment-type"><a href="{% url 'transaction_details' pk=transaction.pk %}">{{ transaction.payment_type }}</a></td>
+            <td><a href="{% url 'transaction_details' pk=transaction.pk %}">{{ transaction.category }}</a></td>
+            <td class="value"><a href="{% url 'transaction_details' pk=transaction.pk %}">{{ transaction.value }}</a></td>
+        </tr>
+        {% endfor %}
+    
+    </table>
+</div>
+

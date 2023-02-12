@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'accounting/header.html' %}
+
+<div class="page-wrapper">
+
+    <div class="content-wrapper half-width-wrapper">
+        <div class="content delete-object">
+
+            <div class="title card-title">{{ category.name }}</div>
+            <form method="post" class="form">
+                {% csrf_token %}
+
+                <div class="non-field-error">{{ form.non_field_errors }}</div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.name.id_for_label }}">{{ form.new_category_name.label }}:</label>
+                    <div class="form-error">{{ form.new_category_name.errors }}</div>
+                    {{ form.new_category_name }}
+                </div>
+
+                <div class="buttons-panel buttons-panel-center">
+                    <button type="submit" class="btn btn-primary btn-second">Delete</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

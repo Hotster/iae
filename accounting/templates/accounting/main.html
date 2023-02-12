@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'accounting/header.html' %}
+
+<div class="page-wrapper">
+    <div class="content-wrapper half-width-wrapper">
+    
+        <!--Add new transaction-->
+        <div class="content-wrapper">
+    
+            <div class="title title-main-page">New transaction</div>
+            <div class="content">
+                <form method="post" class="form transactions-form">
+                    {% csrf_token %}
+                    
+                    <div class="non-field-error">{{ form.non_field_errors }}</div>
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            <div class="form-error">{{ field.errors }}</div>
+                            <div>{{ field }}</div>
+                        </div>
+                    {% endfor %}
+
+                    <div class="buttons-panel buttons-panel-center">
+                        <button type="submit" class="btn btn-primary btn-second">Add transaction</button>
+                    </div>
+
+
+                </form>
+            </div>   
+    
+        </div>
+       
+        <!--Last five transactions-->
+        <div class="content-wrapper">
+            <div class="title title-main-page">Last transactions</div>
+            {% include 'accounting/transactions_table.html' %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
