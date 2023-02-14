@@ -12,6 +12,10 @@
                 <span class="title info-title">Info</span>
                 <table class="info-table">
                     <tr>
+                        <td class="info-label">Balance:</td>
+                        <td class="value">{{ balance }}</td>
+                    </tr>
+                    <tr>
                         <td class="info-label">Income:</td>
                         <td class="value">{{ income_sum }}</td>
                     </tr>
@@ -62,13 +66,36 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="form.payment_type.id_for_label">{{ form.payment_type.label }}</label>
-                        <div class="form-error">{{ form.category.errors }}</div>
+                        <div class="form-error">{{ form.payment_type.errors }}</div>
                         <div class="checkbox-field">{{ form.payment_type }}</div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="form.category.id_for_label">{{ form.category.label }}</label>
                         <div class="form-error">{{ form.category.errors }}</div>
-                        <div class="checkbox-field">{{ form.category }}</div>
+                        <div class="checkbox-field">
+                            <div class="title">Income categories:</div>
+                            {% for field in form.category %}
+                                {% if field.data.value.instance.type == 'Income' %}
+                                    <div class="form-checkbox">{{ field }}</div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="checkbox-field">
+                            <div class="title">Expense categories:</div>
+                            {% for field in form.category %}
+                                {% if field.data.value.instance.type == 'Expense' %}
+                                    <div class="form-checkbox">{{ field }}</div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="checkbox-field">
+                            <div class="title">Transfer categories:</div>
+                            {% for field in form.category %}
+                                {% if field.data.value.instance.type == 'Transfer' %}
+                                    <div class="form-checkbox">{{ field }}</div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="form.value.id_for_label">{{ form.description.label }}</label>

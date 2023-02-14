@@ -70,7 +70,7 @@ class PaymentTypes(LoginRequiredMixin, ListView):
     model = PaymentType
     template_name = 'accounting/payment_types.html'
     context_object_name = 'payment_types'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         current_user = self.request.user
@@ -193,7 +193,7 @@ class Categories(LoginRequiredMixin, ListView):
     model = Category
     template_name = 'accounting/categories.html'
     context_object_name = 'categories'
-    paginate_by = 5
+    paginate_by = 10
 
     def get_queryset(self):
         current_user = self.request.user
@@ -272,24 +272,19 @@ class Transactions(LoginRequiredMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=object_list, **kwargs)
-
-        form = self.filtered_queryset.form
         user_wallet = self.request.user.wallet
-        form.fields['category'].queryset = form.fields['category'].queryset. \
-            filter(wallet=user_wallet). \
-            annotate(usage_count=Count('transaction__category')). \
-            order_by('-usage_count')
-        form.fields['payment_type'].queryset = form.fields['payment_type'].queryset. \
-            filter(wallet=user_wallet). \
-            annotate(usage_count=Count('transaction__payment_type')). \
-            order_by('-usage_count')
+
+        balance = 0
+        payment_types = PaymentType.objects.filter(wallet=user_wallet)
+        for payment_type in payment_types:
+            balance += payment_type.balance
 
         income_sum = 0
         expense_sum = 0
-
         for transaction in self.filtered_queryset.qs:
             if transaction.category.type == 'Income':
                 income_sum += transaction.value
+
             elif transaction.category.type == 'Expense':
                 expense_sum += transaction.value
 
@@ -304,6 +299,8 @@ class Transactions(LoginRequiredMixin, ListView):
 
         context.update({
             'form': self.filtered_queryset.form,
+            'categories': Category.objects.filter(wallet=user_wallet),
+            'balance': balance,
             'income_sum': income_sum,
             'income_all_time_sum': income_all_time_sum,
             'expense_sum': expense_sum,

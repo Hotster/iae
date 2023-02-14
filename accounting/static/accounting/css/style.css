@@ -460,6 +460,11 @@ nav li a:hover {
     display: block;
 }
 
+.checkbox-field .title {
+    font-size: .8em;
+    color: var(--gray-font);
+}
+
 .half-width-wrapper {
     min-width: 50%;
     max-width: 50%;

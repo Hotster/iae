@@ -5,7 +5,7 @@ from accounting.models import PaymentType, Category, Transaction
 
 
 class CreatePaymentTypeForm(forms.ModelForm):
-    name = forms.CharField(max_length=100, label='New name',
+    name = forms.CharField(max_length=100, label='Name',
                            widget=forms.TextInput(attrs={'class': 'form-control'}))
     balance = forms.DecimalField(max_digits=16, decimal_places=2,
                                  widget=forms.NumberInput(attrs={'class': 'form-control'}),
@@ -45,7 +45,7 @@ class DeletePaymentTypeForm(forms.Form):
 
 class CreateCategoryForm(forms.ModelForm):
     types = Category.transition_types
-    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    name = forms.CharField(max_length=100, label='Name', widget=forms.TextInput(attrs={'class': 'form-control'}))
     type = forms.ChoiceField(choices=types, initial=types[0][0], widget=forms.Select(attrs={'class': 'form-control'}))
 
     class Meta:

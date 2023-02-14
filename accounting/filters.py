@@ -8,7 +8,7 @@ class TransactionFilter(django_filters.FilterSet):
     payment_type = django_filters.ModelMultipleChoiceFilter(queryset=PaymentType.objects.all(),
                                                             widget=forms.CheckboxSelectMultiple(
                                                                 attrs={'class': 'form-checkbox'}))
-    category = django_filters.ModelMultipleChoiceFilter(queryset=Category.objects.all(),
+    category = django_filters.ModelMultipleChoiceFilter(queryset=Category.objects.all().order_by('name'),
                                                         widget=forms.CheckboxSelectMultiple(
                                                             attrs={'class': 'form-checkbox'}))
     date = django_filters.DateFilter()
