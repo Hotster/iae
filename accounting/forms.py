@@ -98,7 +98,8 @@ class CreateTransactionForm(forms.ModelForm):
 class UpdateTransactionForm(CreateTransactionForm):
     date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local',
                                                                  'class': 'form-control',
-                                                                 'max': '9999-12-31'}))
+                                                                 'max': '9999-12-31'},
+                                                          format='%Y-%m-%dT%H:%M:%S'))
 
     class Meta:
         model = Transaction

@@ -1,52 +1,57 @@
+import datetime
+
 from django.core.exceptions import PermissionDenied
 
-from accounting.utils import LoginRequiredMixin, PermissionMixin
+from accounting.utils import PermissionMixin, UserQueryset, LoginRequiredMixinCustom
 from django.db.models import Count
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, FormView, ListView, TemplateView, UpdateView, DetailView
+from django.views.generic import CreateView, DeleteView, FormView, ListView, UpdateView, DetailView
 
 from accounting.filters import TransactionFilter
 from accounting.forms import *
-from accounting.models import Category, PaymentType, Transaction, Wallet
+from accounting.models import Category, PaymentType, Transaction
 
 
-class Main(LoginRequiredMixin, CreateView):
+# Main
+class Main(UserQueryset, LoginRequiredMixinCustom, CreateView):
     model = Transaction
     form_class = CreateTransactionForm
     template_name = 'accounting/main.html'
     success_url = reverse_lazy('main')
     extra_context = {}
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            user_wallet = request.user.wallet
-            transactions = Transaction.objects.filter(wallet=user_wallet).order_by('-date')[:5]
-            for transaction in transactions:
-                transaction.date = transaction.date.strftime('%d.%m')
-                transaction.value = '%.2f' % transaction.value
+    def get_queryset(self):
+        user = self.request.user
+        queryset = super().get_user_queryset(user=user, model=self.model).order_by('-date')
+        return queryset
 
-            self.extra_context.update(
-                {'transactions': transactions}
-            )
+    def get_context_data(self, **kwargs):
+        transactions = self.get_queryset()[:5]
 
-        return super().get(request, *args, **kwargs)
+        for transaction in transactions:
+            transaction.date = transaction.date.strftime('%d.%m')
+            transaction.value = '%.2f' % transaction.value
 
-    def get_form(self, form_class=None):
+        kwargs['transactions'] = transactions
+        return super().get_context_data(**kwargs)
+
+    def get_form(self):
         form = self.form_class(**self.get_form_kwargs())
-        if self.request.user.is_authenticated:
-            user_wallet = self.request.user.wallet
-            form.fields['category'].queryset = form.fields['category'].queryset. \
-                filter(wallet=user_wallet). \
-                annotate(usage_count=Count('transaction__category')). \
-                order_by('-usage_count')
-            form.fields['payment_type'].queryset = form.fields['payment_type'].queryset. \
-                filter(wallet=user_wallet). \
-                annotate(usage_count=Count('transaction__payment_type')). \
-                order_by('-usage_count')
+        user_wallet = self.request.user.wallet
+
+        form.fields['category'].queryset = form.fields['category'].queryset. \
+            filter(wallet=user_wallet). \
+            annotate(usage_count=Count('transaction__category')). \
+            order_by('-usage_count')
+        form.fields['payment_type'].queryset = form.fields['payment_type'].queryset. \
+            filter(wallet=user_wallet). \
+            annotate(usage_count=Count('transaction__payment_type')). \
+            order_by('-usage_count')
+
         return form
 
     def form_valid(self, form):
-        user_wallet = Wallet.objects.get(owner=self.request.user)
+        user_wallet = self.request.user.wallet
         form.instance.wallet = user_wallet
         if form.instance.category.type == 'Expense':
             form.instance.value = -abs(form.instance.value)
@@ -59,99 +64,98 @@ class Main(LoginRequiredMixin, CreateView):
         return response
 
 
-class Menu(LoginRequiredMixin, TemplateView):
-    template_name = 'accounting/menu.html'
-    extra_context = {'menu': [{'title': 'Payment types', 'url_name': 'payment_types'},
-                              {'title': 'Categories', 'url_name': 'categories'},
-                              {'title': 'Transactions', 'url_name': 'transactions'}]}
-
-
-class PaymentTypes(LoginRequiredMixin, ListView):
+# Payment types
+class PaymentTypes(UserQueryset, LoginRequiredMixinCustom, ListView):
     model = PaymentType
     template_name = 'accounting/payment_types.html'
     context_object_name = 'payment_types'
     paginate_by = 10
 
     def get_queryset(self):
-        current_user = self.request.user
-        self.queryset = PaymentType.objects.filter(wallet=Wallet.objects.get(owner=current_user))
-        queryset = super().get_queryset()
-
-        for i in range(len(queryset)):
-            queryset[i].balance = "{:,.2f}".format(float(self.queryset[i].balance)).replace(',', ' ')
+        user = self.request.user
+        queryset = super().get_user_queryset(user=user, model=self.model)
         return queryset
 
 
-class CreatePaymentType(LoginRequiredMixin, CreateView):
+class CreatePaymentType(LoginRequiredMixinCustom, CreateView):
     model = PaymentType
     template_name = 'accounting/create_payment_type.html'
     form_class = CreatePaymentTypeForm
     success_url = reverse_lazy('payment_types')
 
-    def get_form(self, form_class=None):
+    def get_form(self):
         form_class = self.get_form_class()
         form = form_class(**self.get_form_kwargs())
         form.instance.wallet = self.request.user.wallet
         return form
 
 
-class UpdatePaymentType(PermissionMixin, LoginRequiredMixin, UpdateView):
+class UpdatePaymentType(PermissionMixin, LoginRequiredMixinCustom, UpdateView):
     model = PaymentType
     form_class = UpdatePaymentTypeForm
     template_name = 'accounting/update_payment_type.html'
     success_url = reverse_lazy('payment_types')
 
 
-class DeletePaymentType(PermissionMixin, LoginRequiredMixin, DeleteView):
+class DeletePaymentType(PermissionMixin, LoginRequiredMixinCustom, DeleteView):
     model = PaymentType
+    form_class = DeletePaymentTypeForm
     template_name = 'accounting/delete_payment_type.html'
     success_url = reverse_lazy('payment_types')
     extra_context = {}
+    object = None
 
-    def get(self, request, *args, **kwargs):
-        user_wallet = Wallet.objects.get(owner=self.request.user)
+    def get_context_data(self, **kwargs):
         payment_type = self.get_object()
-        form = DeletePaymentTypeForm()
-        form.fields['name'].queryset = PaymentType.objects.filter(wallet=user_wallet).\
+        kwargs['payment_type'] = payment_type
+        return super().get_context_data(**kwargs)
+
+    def get_form(self):
+        form = self.form_class(**self.get_form_kwargs())
+        user_wallet = self.request.user.wallet
+        payment_type = self.get_object()
+
+        form.fields['name'].queryset = form.fields['name'].queryset.filter(wallet=user_wallet).\
             exclude(pk=payment_type.pk).\
             annotate(usage_count=Count('transaction__payment_type')).order_by('-usage_count')
 
-        self.extra_context.update({
-            'form': form,
-            'payment_type': payment_type
-        })
-
-        return super().get(request, *args, **kwargs)
+        return form
 
     def post(self, request, *args, **kwargs):
         user_wallet = request.user.wallet
-        payment_type = self.get_object()
-        payment_type_id = request.POST.get('name')
-        payment_type_to_convey = PaymentType.objects.get(pk=payment_type_id)
-        transactions = Transaction.objects.filter(wallet=user_wallet, payment_type=payment_type)
-        for transaction in transactions:
-            transaction.payment_type = payment_type_to_convey
-            transaction.save()
+        self.object = self.get_object()
+        form = self.get_form()
 
-        payment_type_to_convey.balance += payment_type.balance
-        payment_type_to_convey.save()
+        if form.is_valid():
+            payment_type_id = request.POST.get('name')
+            payment_type_to_convey = PaymentType.objects.get(pk=payment_type_id)
+            transactions = Transaction.objects.filter(wallet=user_wallet, payment_type=self.object)
 
-        return super().post(request, *args, **kwargs)
+            for transaction in transactions:
+                transaction.payment_type = payment_type_to_convey
+                transaction.save()
+
+            payment_type_to_convey.balance += self.object.balance
+            payment_type_to_convey.save()
+
+            return self.form_valid(form)
+
+        else:
+            return self.form_invalid(form)
 
 
-class TransferBetweenPaymentTypes(LoginRequiredMixin, FormView):
+class TransferBetweenPaymentTypes(LoginRequiredMixinCustom, FormView):
     form_class = TransferBetweenPaymentTypesForm
     template_name = 'accounting/transfer_between_payment_types.html'
     success_url = reverse_lazy('payment_types')
     extra_context = {}
 
-    def get_form(self, form_class=None):
-        """Return an instance of the form to be used in this view."""
+    def get_form(self):
         user_wallet = self.request.user.wallet
         form_class = self.get_form_class()
         form = form_class(**self.get_form_kwargs())
-        form.fields['payment_type_from'].queryset = PaymentType.objects.filter(wallet=user_wallet)
-        form.fields['payment_type_to'].queryset = PaymentType.objects.filter(wallet=user_wallet)
+        form.fields['payment_type_from'].queryset = form.fields['payment_type_from'].queryset.filter(wallet=user_wallet)
+        form.fields['payment_type_to'].queryset = form.fields['payment_type_to'].queryset.filter(wallet=user_wallet)
         return form
 
     def post(self, request, *args, **kwargs):
@@ -189,76 +193,84 @@ class TransferBetweenPaymentTypes(LoginRequiredMixin, FormView):
             return self.form_invalid(form)
 
 
-class Categories(LoginRequiredMixin, ListView):
+# Categories
+class Categories(UserQueryset, LoginRequiredMixinCustom, ListView):
     model = Category
     template_name = 'accounting/categories.html'
     context_object_name = 'categories'
-    paginate_by = 10
+    paginate_by = 15
 
     def get_queryset(self):
-        current_user = self.request.user
-        self.queryset = Category.objects.filter(wallet=Wallet.objects.get(owner=current_user), service=False)
-        return super().get_queryset()
+        user = self.request.user
+        queryset = super().get_user_queryset(user=user, model=self.model).filter(service=False).order_by('type', 'name')
+        return queryset
 
 
-class CreateCategory(LoginRequiredMixin, CreateView):
+class CreateCategory(LoginRequiredMixinCustom, CreateView):
     model = Category
     template_name = 'accounting/create_category.html'
     form_class = CreateCategoryForm
     success_url = reverse_lazy('categories')
 
-    def get_form(self, form_class=None):
+    def get_form(self):
         form_class = self.get_form_class()
         form = form_class(**self.get_form_kwargs())
         form.instance.wallet = self.request.user.wallet
         return form
 
 
-class UpdateCategory(PermissionMixin, LoginRequiredMixin, UpdateView):
+class UpdateCategory(PermissionMixin, LoginRequiredMixinCustom, UpdateView):
     model = Category
     form_class = UpdateCategoryForm
     template_name = 'accounting/update_category.html'
     success_url = reverse_lazy('categories')
 
 
-class DeleteCategory(PermissionMixin, LoginRequiredMixin, DeleteView):
+class DeleteCategory(PermissionMixin, LoginRequiredMixinCustom, DeleteView):
     model = Category
+    form_class = DeleteCategoryForm
     template_name = 'accounting/delete_category.html'
     success_url = reverse_lazy('categories')
     extra_context = {}
+    object = None
 
-    def get(self, request, *args, **kwargs):
-        user_wallet = Wallet.objects.get(owner=self.request.user)
-        current_object = self.get_object()
-        form = DeleteCategoryForm()
-        form.fields['new_category_name'].queryset = Category.objects.\
-            filter(wallet=user_wallet, type=current_object.type).\
-            exclude(pk=current_object.pk).\
+    def get_form(self):
+        form = self.form_class(**self.get_form_kwargs())
+        user_wallet = self.request.user.wallet
+        category = self.get_object()
+
+        form.fields['new_category_name'].queryset = form.fields['new_category_name'].queryset.filter(
+            wallet=user_wallet, type=category.type).exclude(pk=category.pk).\
             annotate(usage_count=Count('transaction__category')).order_by('-usage_count')
 
-        self.extra_context.update({
-            'form': form
-        })
-
-        return super().get(request, *args, **kwargs)
+        return form
 
     def post(self, request, *args, **kwargs):
         user_wallet = request.user.wallet
-        category = self.get_object()
-        category_type_id = request.POST.get('new_category_name')
-        category_type_to_convey = Category.objects.get(pk=category_type_id)
-        transactions = Transaction.objects.filter(wallet=user_wallet, category=category)
-        for transaction in transactions:
-            transaction.category = category_type_to_convey
-            transaction.save()
+        self.object = self.get_object()
+        form = self.get_form()
 
-        return super().post(request, *args, **kwargs)
+        if form.is_valid():
+            category_type_id = request.POST.get('new_category_name')
+            category_type_to_convey = Category.objects.get(pk=category_type_id)
+            transactions = Transaction.objects.filter(wallet=user_wallet, category=self.object)
+
+            for transaction in transactions:
+                transaction.category = category_type_to_convey
+                transaction.save()
+
+            return self.form_valid(form)
+
+        else:
+            return self.form_invalid(form)
 
 
-class Transactions(LoginRequiredMixin, ListView):
+# Transactions
+class Transactions(LoginRequiredMixinCustom, ListView):
     model = Transaction
     template_name = 'accounting/transactions.html'
     context_object_name = 'transactions'
+    filtered_queryset = None
     paginate_by = 50
 
     def get_queryset(self):
@@ -297,9 +309,12 @@ class Transactions(LoginRequiredMixin, ListView):
             elif transaction.category.type == 'Expense':
                 expense_all_time_sum += transaction.value
 
+        form = self.filtered_queryset.form
+        form.fields['payment_type'].queryset = form.fields['payment_type'].queryset.filter(wallet=user_wallet)
+        form.fields['category'].queryset = form.fields['category'].queryset.filter(wallet=user_wallet)
+
         context.update({
             'form': self.filtered_queryset.form,
-            'categories': Category.objects.filter(wallet=user_wallet),
             'balance': balance,
             'income_sum': income_sum,
             'income_all_time_sum': income_all_time_sum,
@@ -309,7 +324,7 @@ class Transactions(LoginRequiredMixin, ListView):
         return context
 
 
-class TransactionDetails(PermissionMixin, LoginRequiredMixin, DetailView):
+class TransactionDetails(PermissionMixin, LoginRequiredMixinCustom, DetailView):
     model = Transaction
     context_object_name = 'transaction'
     template_name = 'accounting/transaction_details.html'
@@ -320,17 +335,23 @@ class TransactionDetails(PermissionMixin, LoginRequiredMixin, DetailView):
         return context_data
 
 
-class UpdateTransaction(PermissionMixin, LoginRequiredMixin, UpdateView):
+class UpdateTransaction(UserQueryset, PermissionMixin, LoginRequiredMixinCustom, UpdateView):
     model = Transaction
     form_class = UpdateTransactionForm
     template_name = 'accounting/update_transaction.html'
     success_url = reverse_lazy('main')
     object = None
 
-    def get_form(self, form_class=None):
-        user_wallet = Wallet.objects.get(owner=self.request.user)
+    def get_queryset(self):
+        user = self.request.user
+        queryset = super().get_user_queryset(user=user, model=self.model)
+        return queryset
+
+    def get_form(self):
+        user_wallet = self.request.user.wallet
         form = self.form_class(**self.get_form_kwargs())
-        form.fields['category'].queryset = Category.objects. \
+
+        form.fields['category'].queryset = form.fields['category'].queryset. \
             filter(wallet=user_wallet). \
             annotate(usage_count=Count('transaction__category')). \
             order_by('-usage_count')
@@ -364,7 +385,7 @@ class UpdateTransaction(PermissionMixin, LoginRequiredMixin, UpdateView):
             return super().get_success_url()
 
 
-class DeleteTransaction(PermissionMixin, LoginRequiredMixin, DeleteView):
+class DeleteTransaction(PermissionMixin, LoginRequiredMixinCustom, DeleteView):
     model = Transaction
     template_name = 'accounting/delete_transaction.html'
     context_object_name = 'transaction'

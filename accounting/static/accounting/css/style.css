@@ -65,8 +65,12 @@ input[type="datetime-local"] {
     -webkit-appearance: none;
 }
 
+input::-webkit-date-and-time-value {
+    text-align: left;
+  }
+
 select {
-    appearance: none;
+    -webkit-appearance: none;
 }
 
 .page-wrapper {
@@ -287,18 +291,22 @@ nav li a:hover {
     padding-top: .5em ;
 }
 
-.transactions-table {
+.table {
     display: block;
     table-layout: fixed;
 }
 
-.transactions-table tbody {
+.table tbody {
     display: block;
 }
 
-.transactions-table tr {
+.table tr {
     display: flex;
     border-bottom: 1px solid var(--gray-line);
+}
+
+.table tr:last-child {
+    border-bottom: none;
 }
 
 .transactions-table tr:first-child {
@@ -316,8 +324,24 @@ nav li a:hover {
     word-wrap: break-word;
 }
 
-.transactions-table tr:last-child {
-    border-bottom: none;
+.categories-table th,
+.categories-table td {
+    display: inline-block;
+    padding: .2em .3em;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+}
+
+.categories-table-name {
+    width: 50%;
+}
+
+.categories-table-type {
+    width: 25%;
+}
+
+.categories-table-buttons {
+    width: 25%;
 }
 
 .value {

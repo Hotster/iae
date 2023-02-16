@@ -15,22 +15,30 @@
             </div>
         </div>
 
+        <div class="content">
+            <table class="table categories-table">
 
-        {% for category in categories %}
-            <div class="content card">
+                <tr>
+                    <th class="categories-table-name">Name</th>
+                    <th class="categories-table-type">Type</th>
+                    <th class="categories-table-buttons"></th>
+                </tr>
 
-                <div class="title">{{ category.name }}</div>
-                <div class="card-text">{{ category.type }}</div>
+                {% for category in categories %}
+                    <tr>
+                        <td class="categories-table-name">{{ category.name }}</td>
+                        <td class="categories-table-type">{{ category.type }}</td>
+                        <td class="categories-table-buttons">
+                            <div class="buttons-panel">
+                                <a href="{% url 'update_category' pk=category.pk %}?redirect_url={{ request.get_full_path }}" class="btn btn-primary btn-round"><img class="icon" src="{% static 'accounting/img/edit.svg' %}"></a>
+                                <a href="{% url 'delete_category' pk=category.pk %}" class="btn btn-danger btn-round"><img class="icon" src="{% static 'accounting/img/close.svg' %}"></a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
 
-                {% block delete-form %}
-                    <div class="buttons-panel">
-                        <a href="{% url 'update_category' pk=category.pk %}?redirect_url={{ request.get_full_path }}" class="btn btn-primary btn-round"><img class="icon" src="{% static 'accounting/img/edit.svg' %}"></a>
-                        <a href="{% url 'delete_category' pk=category.pk %}" class="btn btn-danger btn-round"><img class="icon" src="{% static 'accounting/img/close.svg' %}"></a>
-                    </div>
-                {% endblock %}
-
-            </div>
-        {% endfor %}
+            </table>
+        </div>
 
         {% include 'accounting/paginator.html' %}
 

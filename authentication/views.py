@@ -1,5 +1,4 @@
 from django.contrib.auth import login, logout
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -36,7 +35,7 @@ class Registry(CreateView):
 
 
 class Login(LoginView):
-    form_class = AuthenticationForm
+    form_class = LoginForm
     template_name = 'authentication/login.html'
 
     def get_success_url(self):

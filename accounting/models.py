@@ -1,7 +1,6 @@
-from datetime import datetime
-
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class Wallet(models.Model):
@@ -48,7 +47,7 @@ class Transaction(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     value = models.DecimalField(max_digits=16, decimal_places=2)
     description = models.CharField(max_length=255, null=True, blank=True)
-    date = models.DateTimeField(default=datetime.now)
+    date = models.DateTimeField(default=timezone.now)
 
     def delete(self, using=None, keep_parents=False):
         collector = super(Transaction, self).delete()
