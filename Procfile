@@ -1,0 +1,1 @@
+web: gunicorn iae.wsgi --log-file -
