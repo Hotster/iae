@@ -12,13 +12,16 @@ class TransactionFilter(django_filters.FilterSet):
                                                         widget=forms.CheckboxSelectMultiple(
                                                             attrs={'class': 'form-checkbox'}))
     date = django_filters.DateFilter()
-    date__gte = django_filters.DateFilter(field_name='date', lookup_expr='gte',
-                                          widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control',
-                                                                        'max': '9999-12-31',
-                                                                        'placeholder': 'From'}))
-    date__lte = django_filters.DateFilter(field_name='date', lookup_expr='lte',
-                                          widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control',
-                                                                        'max': '9999-12-31'}))
+    date__gte = django_filters.DateTimeFilter(field_name='date', lookup_expr='date__gte',
+                                              widget=forms.DateTimeInput(attrs={'type': 'date',
+                                                                                'class': 'form-control',
+                                                                                'max': '9999-12-31',
+                                                                                'placeholder': 'From'}))
+    date__lte = django_filters.DateTimeFilter(field_name='date', lookup_expr='date__lte',
+                                              widget=forms.DateTimeInput(attrs={'type': 'date',
+                                                                                'class': 'form-control',
+                                                                                'max': '9999-12-31',
+                                                                                'placeholder': 'To'}))
     value = django_filters.NumberFilter()
     value__gte = django_filters.NumberFilter(field_name='value', lookup_expr='gte',
                                              widget=forms.NumberInput(attrs={'class': 'form-control',

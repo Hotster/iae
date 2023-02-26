@@ -75,13 +75,13 @@ class UpdateCategoryForm(forms.ModelForm):
 
 
 class DeleteCategoryForm(forms.Form):
-    new_category_name = forms.ModelChoiceField(queryset=Category.objects.filter(service=False),
-                                               label='Select a new category for existing transactions',
-                                               empty_label=None, widget=forms.Select(attrs={'class': 'form-control'}))
+    name = forms.ModelChoiceField(queryset=Category.objects.filter(service=False),
+                                  label='Select a new category for existing transactions',
+                                  empty_label=None, widget=forms.Select(attrs={'class': 'form-control'}))
 
 
 class CreateTransactionForm(forms.ModelForm):
-    category = forms.ModelChoiceField(queryset=Category.objects.filter(service=False), empty_label=None,
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label=None,
                                       widget=forms.Select(attrs={'class': 'form-control'}))
     payment_type = forms.ModelChoiceField(queryset=PaymentType.objects.all(), empty_label=None,
                                           widget=forms.Select(attrs={'class': 'form-control'}))
@@ -99,11 +99,17 @@ class UpdateTransactionForm(CreateTransactionForm):
     date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local',
                                                                  'class': 'form-control',
                                                                  'max': '9999-12-31'},
-                                                          format='%Y-%m-%dT%H:%M:%S'))
+                                                          format='%Y-%m-%dT%H:%M'))
 
     class Meta:
         model = Transaction
         fields = ['payment_type', 'category', 'value', 'description', 'date']
+
+    def clean_category(self):
+        category = self.cleaned_data['category']
+        if category.type != self.instance.category.type:
+            raise ValidationError("The type of the transaction category cannot be modified.")
+        return category
 
 
 class TransferBetweenPaymentTypesForm(forms.Form):

@@ -11,8 +11,8 @@ class Wallet(models.Model):
 
 
 class PaymentType(models.Model):
-    name = models.CharField(max_length=100)
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
     balance = models.DecimalField(default=0, max_digits=16, decimal_places=2)
 
     def __str__(self):
@@ -38,7 +38,9 @@ class Category(models.Model):
         return self.name
 
     class Meta:
-        unique_together = ['wallet', 'name']
+        constraints = [
+            models.UniqueConstraint(fields=['wallet', 'name'], name='unique_name_for_category')
+        ]
 
 
 class Transaction(models.Model):
@@ -48,13 +50,6 @@ class Transaction(models.Model):
     value = models.DecimalField(max_digits=16, decimal_places=2)
     description = models.CharField(max_length=255, null=True, blank=True)
     date = models.DateTimeField(default=timezone.now)
-
-    def delete(self, using=None, keep_parents=False):
-        collector = super(Transaction, self).delete()
-        payment_type = PaymentType.objects.get(pk=self.payment_type.pk)
-        payment_type.balance = payment_type.balance - self.value
-        payment_type.save()
-        return collector
 
     def __str__(self):
         return f'{self.wallet}: {self.category} - {self.value} ({self.description})'

@@ -1,25 +1,18 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse_lazy
-from django.views.generic.base import TemplateResponseMixin
 
 
-class LoginRequiredMixinCustom(LoginRequiredMixin):
-    """Redirect to login page if not authorized"""
-    login_url = reverse_lazy('login')
-
-
-class PermissionMixin(TemplateResponseMixin):
+class PermissionMixin(LoginRequiredMixin):
     """Allows to get and operate only user's data"""
-    def render_to_response(self, context, **response_kwargs):
-        if context.get('object').wallet_id == self.request.user.wallet.pk:
-            return super(PermissionMixin, self).render_to_response(context, **response_kwargs)
-        else:
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_anonymous and self.get_object().wallet != request.user.wallet:
             raise PermissionDenied()
+        return super().dispatch(request, *args, **kwargs)
 
 
 class UserQueryset:
     """Queryset filtered by user"""
-    def get_user_queryset(self, user, model):
+    @staticmethod
+    def get_user_queryset(user, model):
         queryset = model.objects.filter(wallet=user.wallet)
         return queryset
