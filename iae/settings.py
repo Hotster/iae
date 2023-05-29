@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from pathlib import Path
 
+import dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,10 +43,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'django_filters',
+
     'accounting.apps.AccountingConfig',
     'authentication.apps.AuthenticationConfig'
 ]
+
+# Load environment variables
+dotenv.load_dotenv()
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -84,11 +91,11 @@ WSGI_APPLICATION = 'iae.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('IAE_DB_NAME'),
-        'USER': os.getenv('IAE_DB_USER'),
-        'PASSWORD': os.getenv('IAE_DB_PASSWORD'),
-        'HOST': os.getenv('IAE_DB_HOST'),
-        'PORT': os.getenv('IAE_DB_PORT')
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST'),
+        'PORT': os.getenv('POSTGRES_PORT')
     }
 }
 
